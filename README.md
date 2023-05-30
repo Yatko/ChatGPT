@@ -1,2 +1,2 @@
 # ChatGPT
-ChatGPT Example
+OpenAI Chatbot Script - ChatGPT Example HTML/JS 
