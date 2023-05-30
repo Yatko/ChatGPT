@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>OpenAI Chat</title>
+</head>
+<body>
+  <h1>OpenAI Chatbot Example</h1>
+
+  <div id="chat-container">
+    <div id="chat-log"></div>
+    <input type="text" id="user-input" placeholder="Type your message..." />
+    <button id="send-btn">Send</button>
+  </div>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script>
+    // OpenAI API Configuration
+    const openaiApiKey = 'YOUR_API_KEY'; // Replace with your OpenAI API key
+    const apiUrl = 'https://api.openai.com/v1/engines/davinci-codex/completions';
+
+    // Chat logic
+    const chatLog = document.getElementById('chat-log');
+    const userInput = document.getElementById('user-input');
+    const sendBtn = document.getElementById('send-btn');
+
+    sendBtn.addEventListener('click', sendMessage);
+    userInput.addEventListener('keydown', function(event) {
+      if (event.keyCode === 13) {
+        sendMessage();
+      }
+    });
+
+    function sendMessage() {
+      const message = userInput.value;
+      if (message.trim() === '') return;
+
+      appendMessage('user', message);
+      userInput.value = '';
+
+      sendRequest(message).then(response => {
+        const reply = response.choices[0].text.trim();
+        appendMessage('bot', reply);
+      }).catch(error => {
+        console.error('Error:', error);
+      });
+    }
+
+    function sendRequest(message) {
+      return fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${openaiApiKey}`
+        },
+        body: JSON.stringify({
+          'prompt': message,
+          'max_tokens': 50
+        })
+      }).then(response => response.json());
+    }
+
+    function appendMessage(sender, message) {
+      const messageContainer = document.createElement('div');
+      messageContainer.classList.add('message', sender);
+      messageContainer.textContent = message;
+
+      chatLog.appendChild(messageContainer);
+      chatLog.scrollTop = chatLog.scrollHeight;
+    }
+  </script>
+
+  <style>
+    #chat-container {
+      width: 400px;
+      margin: 0 auto;
+    }
+
+    .message {
+      margin-bottom: 10px;
+      padding: 5px;
+      border-radius: 5px;
+    }
+
+    .user {
+      background-color: #F5F5F5;
+    }
+
+    .bot {
+      background-color: #DCF8C6;
+    }
+  </style>
+</body>
+</html>
